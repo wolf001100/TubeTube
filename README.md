@@ -1,18 +1,17 @@
 ![Logo](tubetube/static/tubetube.png)
 
 
-**TubeTube** is a simple YouTube downloader.
+**TubeTube** 是一个好用的YouTube下载器
 
 
 ## Features:
-- **Multithreaded Downloads:** Fast, simultaneous downloads.
-- **Custom Locations & Formats:** YAML-based settings.
-- **Mobile Optimized:** Designed for small screens.
-- **Download Options:** Choose between audio or video.
-- **Live Video Support:** Supports multiple live streams.
+- **多线程下载**
+- **可定制下载格式** 
+- **移动端UI** 
+- **支持直播流**
 
 
-## Docker Compose Configuration
+## Docker Compose 范例：
 
 Create a `docker-compose.yml` file:
 
@@ -29,9 +28,9 @@ services:
       - /path/to/podcasts:/data/Podcast
       - /path/to/videos:/data/Video
       - /path/to/config:/config
-      - /path/to/temp:/temp # Optional. Temp files are deleted on startup.
-      - /etc/localtime:/etc/localtime:ro # Optional. Sync time with host.
-      - /etc/timezone:/etc/timezone:ro # Optional. Sync timezone with host.
+      - /path/to/temp:/temp # 可选 临时文件会在重启时删除
+      - /etc/localtime:/etc/localtime:ro # 可选. 跟主机同步时间
+      - /etc/timezone:/etc/timezone:ro # 可选，跟主机同步时区
     environment:
       - PUID=1000
       - PGID=1000
@@ -39,9 +38,9 @@ services:
 ```
 
 
-## Directory Configuration
+## 目录设置：
 
-Create a `settings.yaml` file in the `/path/to/config` directory with the following format:
+在/path/to/config目录里创建一个setting.yaml，内容为：
 
 ```yaml
 General:
@@ -63,52 +62,53 @@ Video:
 ```
 
 
-### Notes:
+### 注解:
 
-- Replace `/path/to/general`, etc.. with actual paths on your host machine.
-- Ensure the `settings.yaml` file is correctly placed in the `/path/to/config` directory.
-- The volume paths in the `docker-compose.yml` file should match the names specified in the settings.yaml file (e.g., /data/**General**, etc..).
-- You can create as many directory locations as needed in `settings.yaml`, but each must be mapped individually in `docker-compose.yml`.
-- To use a cookies file, create a `cookies.txt` file and place it in the config directory.
+- 把'/path/to/general'替换为你需要的路径
+- 确认'setting.yaml'在'/path/to/config'目录里
+- 'docker-compose.yml'里的目设置要和'settings.yaml'里一致
+- 你可以在'settings.yaml'使用多个目录，请确保跟'docker-compose.yaml'一致
+- 如需要使用cookie，请在'/path/to/config'里创建cookies.txt
 
-#### Subtitle Configuration
+#### 字幕设置
 
-- When `WRITE_SUBS=True`, actual subtitles will be saved to a subtitle file. If no actual subtitles are available, no subtitles will be created. Additionally, setting `ALLOW_AUTO_SUBS=True` provides a fallback to automatically generated subtitles saved to the subtitle file.
-- When `EMBED_SUBS=True`, actual subtitles will be embedded into the video. If no actual subtitles are present, no subtitles will be included. Similarly, `ALLOW_AUTO_SUBS=True` can serve as a fallback to embed automatically generated subtitles.
+- 当'WRITE_SUBS=True'时，下载的时候创建单独的字幕文件。如果没有字幕可用，就不会创建。
+- 当'ALLOW_AUTO_SUBS=True'时，将默认单独创建字幕文件。
+- 当'EMBED_SUBS=True'时，字幕文件给将会内封进视频文件。如果没有字幕可用，就不会内封。
+- 当'ALLOW_AUTO_SUBS=True'时，将默认内封字幕文件。
+- 当'ALLOW_AUTO_SUBS'和'WRITE_SUBS'或者'EMBED_SUBS'搭配使用时，下载器将尝试下载字幕，如果没有字幕可用，下载器将下载“实时翻译字幕”
 
-To effectively manage subtitles, enable `ALLOW_AUTO_SUBS` in conjunction with either `WRITE_SUBS` or `EMBED_SUBS`. This configuration will attempt to download actual subtitles, and if they are not available, it will default to using automatically generated subtitles.
 
-## Configuration via Environment Variables
+## 环境变量设置
 
-Customize the behavior of **TubeTube** by setting the following environment variables in your `docker-compose.yml` file:
 
 ```yaml
 environment:
-  - PUID=1000                       # User ID for permissions (default: 1000)
-  - PGID=1000                       # Group ID for permissions (default: 1000)
-  - VERBOSE_LOGS=false              # Enable verbose logging for yt-dlp (default: false)
-  - TRIM_METADATA=false             # Trim metadata from files (default: false)
-  - PREFERRED_LANGUAGE=en           # Desired audio language for downloads (default: en)
-  - PREFERRED_AUDIO_CODEC=aac       # Desired audio codec (default: aac)
-  - PREFERRED_VIDEO_CODEC=vp9       # Desired video codec (default: vp9)
-  - PREFERRED_VIDEO_EXT=mp4         # Desired video file extension (default: mp4)
-  - EMBED_SUBS=false                # Embed subtitles in the video (default: false)
-  - WRITE_SUBS=false                # Write subtitles as separate files (default: false)
-  - ALLOW_AUTO_SUBS=false           # Allow automatically generated subtitles as a fallback (default: true)
-  - SUBTITLE_FORMAT=vtt             # Format of the subtitles (default: vtt)
-  - SUBTITLE_LANGUAGES=en           # Subtitle language (default: en)
-  - THREAD_COUNT=4                  # Number of threads for processing (default: 4)
+  - PUID=1000                       # 用户ID(默认: 1000)
+  - PGID=1000                       # 组ID(默认: 1000)
+  - VERBOSE_LOGS=false              # 详细日志模式(默认：关闭)
+  - TRIM_METADATA=false             # 提取元数据(默认: 关闭)
+  - PREFERRED_LANGUAGE=en           # 偏好语言(默认: 英语)
+  - PREFERRED_AUDIO_CODEC=aac       # 偏好音频编码 (默认: aac)
+  - PREFERRED_VIDEO_CODEC=vp9       # 偏好视频编码 (默认: vp9)
+  - PREFERRED_VIDEO_EXT=mp4         # 偏好封装容器 (默认: mp4)
+  - EMBED_SUBS=false                # 内封字幕 (默认: 关闭)
+  - WRITE_SUBS=false                # 单独输出字幕文件 (默认：关闭)
+  - ALLOW_AUTO_SUBS=false           # 自动输出字幕文件 (默认: 打开)
+  - SUBTITLE_FORMAT=vtt             # 字幕文件格式 (默认: vtt)
+  - SUBTITLE_LANGUAGES=en           # 字幕语言 (默认: 英语)
+  - THREAD_COUNT=4                  # 下载线程数 (默认: 4线程)
 ```
 
-## Screenshots
+## 界面图
 
-### Phone (Dark Mode)
+### 手机界面图 (暗黑模式)
 
 ![Phone](tubetube/static/phone-screenshot.png)
 
 
 
-### Desktop (Dark Mode)
+### Desktop (暗黑模式)
 
 ![Screenshot](tubetube/static/screenshot.png)
 
